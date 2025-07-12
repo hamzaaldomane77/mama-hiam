@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* خط المراعي للموقع بالكامل */
+* {
+  font-family: 'Almarai', sans-serif;
+}
+
+body {
+  font-family: 'Almarai', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Removed Custom Swiper Navigation Styling */
+
+/* Custom Swiper Styling for Testimonials */

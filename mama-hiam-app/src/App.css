@@ -1,0 +1,31 @@
+/* خط المراعي للتطبيق */
+.App {
+  font-family: 'Almarai', sans-serif;
+}
+
+/* تحسينات إضافية للخط العربي */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Almarai', sans-serif;
+  font-weight: 700;
+}
+
+p, span, div, a {
+  font-family: 'Almarai', sans-serif;
+}
+
+/* تحسين قراءة النصوص العربية */
+.text-rtl {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Almarai', sans-serif;
+}
+
+/* تحسين العناصر النصية */
+input, textarea, select, button {
+  font-family: 'Almarai', sans-serif;
+}
+
+/* تحسين تنسيق الخط للعناصر الصغيرة */
+.text-sm, .text-xs {
+  font-family: 'Almarai', sans-serif;
+}
