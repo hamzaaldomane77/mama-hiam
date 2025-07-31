@@ -12,7 +12,7 @@ function HomePage() {
       <NewArrivals />
       <Discounts />
       <FeaturedProducts />
-      <Testimonials />
+      {/* <Testimonials /> */}
     </div>
   );
 }

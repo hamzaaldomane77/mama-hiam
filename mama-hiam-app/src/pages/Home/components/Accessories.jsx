@@ -51,7 +51,8 @@ function FeaturedProductCard({ product, index }) {
         boxShadow: "0px 10px 20px rgba(0,0,0,0.1)" // Add more pronounced shadow
       }}
       transition={{ duration: 0.2 }} // Smooth hover transition
-      className="bg-white rounded-xl shadow-md overflow-hidden"
+      className="rounded-xl shadow-lg overflow-hidden border border-gray-100"
+      style={{ backgroundColor: '#FFFFFF' }}
     >
       <Link to={`/products/${product.id}`} className="block">
         {/* Image Container */}
@@ -60,7 +61,8 @@ function FeaturedProductCard({ product, index }) {
           
           {/* شارة مميز */}
           <div className="absolute top-2 right-2">
-            <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+            <span className="text-[#e6403c] text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+                  style={{ backgroundColor: '#FFF4B1' }}>
               ⭐ مميز
             </span>
           </div>
@@ -68,7 +70,8 @@ function FeaturedProductCard({ product, index }) {
           {/* شارة إضافية للمنتج الجديد */}
           {product.new_collection && (
             <div className="absolute top-2 left-2">
-              <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              <span className="text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+                    style={{ backgroundColor: '#B8E4C9' }}>
                 جديد
               </span>
             </div>
@@ -77,12 +80,12 @@ function FeaturedProductCard({ product, index }) {
 
         {/* Text Content */}
         <div className="px-3 pb-3">
-          <h3 className="text-lg font-semibold text-dark-blue mb-2 line-clamp-2">{product.name}</h3>
+          <h3 className="text-lg font-semibold mb-2 line-clamp-2" style={{ color: '#E53935' }}>{product.name}</h3>
           
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xl font-bold text-primary-orange">{product.price} ر.س</span>
+            <span className="text-xl font-bold" style={{ color: '#E53935' }}>{product.price} ل.س</span>
             {product.old_price && (
-              <span className="text-sm text-gray-500 line-through">{product.old_price} ر.س</span>
+              <span className="text-sm text-gray-500 line-through">{product.old_price} ل.س</span>
             )}
           </div>
         </div>
@@ -93,11 +96,14 @@ function FeaturedProductCard({ product, index }) {
         <button
           onClick={handleAddToCart}
           disabled={isAdded}
-          className={`w-full font-bold py-2 px-4 rounded-lg transition-colors duration-200 ${
+                          className={`w-full font-bold py-2 px-4 rounded-full transition-colors duration-200 ${
             isAdded 
-              ? 'bg-green-500 hover:bg-green-600 text-white' 
-              : 'bg-primary-orange hover:bg-orange-600 text-white'
+              ? 'text-white' 
+              : 'text-white'
           }`}
+          style={{ 
+            backgroundColor: isAdded ? '#B8E4C9' : '#E53935'
+          }}
         >
           {isAdded ? (
             <span className="flex items-center justify-center gap-1">
@@ -105,7 +111,12 @@ function FeaturedProductCard({ product, index }) {
               <span className="text-xs">✓</span>
             </span>
           ) : (
-            'أضف للسلة'
+            <span className="flex items-center justify-center gap-1">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              أضف للسلة
+            </span>
           )}
         </button>
       </div>
@@ -125,23 +136,17 @@ function FeaturedProducts() {
         
         const response = await fetchFeaturedProductsFromAPI();
         
-        console.log('🔄 Featured Products API Response:', response.data);
-        
         if (response.data && response.data.length > 0) {
           // تصفية المنتجات للتأكد من أنها مميزة فقط
           const featuredProducts = response.data.filter(product => product.featured === true);
-          
-          console.log('✅ Filtered Featured Products:', featuredProducts);
           
           if (featuredProducts.length > 0) {
             // أخذ أول 6 منتجات من المنتجات المميزة
             setProductsToShow(featuredProducts.slice(0, FEATURED_PRODUCTS_TO_SHOW));
           } else {
-            console.log('⚠️ No featured products found after filtering');
             setProductsToShow([]);
           }
         } else {
-          console.log('⚠️ No products in API response');
           setProductsToShow([]);
         }
       } catch (err) {
@@ -155,13 +160,17 @@ function FeaturedProducts() {
 
   if (error) {
     return (
-      <section className="py-12 bg-gradient-to-br from-light-orange/10 via-cream-beige/20 to-white">
-        <div className="container mx-auto px-4">
+      <section className="py-12 relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+        {/* خلفية ملونة طفولية */}
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/40 via-blue-50/30 to-green-50/40"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="mb-4" style={{ color: '#E53935' }}>{error}</p>
             <button 
               onClick={() => window.location.reload()}
-              className="bg-primary-orange hover:opacity-90 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-300"
+                                className="text-white font-bold py-2 px-6 rounded-lg transition duration-300"
+              style={{ backgroundColor: '#E53935' }}
             >
               إعادة المحاولة
             </button>
@@ -176,9 +185,22 @@ function FeaturedProducts() {
   }
 
   return (
-    <section className="py-12 bg-gradient-to-br from-light-orange/10 via-cream-beige/20 to-white">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-primary-orange mb-8">المنتجات المميزة</h2>
+    <section className="py-12 relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+      {/* خلفية ملونة طفولية */}
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/40 via-blue-50/30 to-green-50/40"></div>
+      
+      {/* طبقة تدرج إضافية */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-pink-50/30 via-transparent to-yellow-50/30"></div>
+      
+      {/* عناصر زخرفية */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 right-20 w-64 h-64 rounded-full blur-3xl" style={{ backgroundColor: '#FFF4B1', opacity: 0.4 }}></div>
+        <div className="absolute bottom-10 left-20 w-48 h-48 rounded-full blur-3xl" style={{ backgroundColor: '#A7D8F0', opacity: 0.3 }}></div>
+        <div className="absolute top-1/2 left-1/4 w-80 h-80 rounded-full blur-3xl" style={{ backgroundColor: '#FADADD', opacity: 0.3 }}></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <h2 className="text-3xl font-bold text-center mb-8" style={{ color: '#E53935' }}>المنتجات المميزة</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {productsToShow.map((product, index) => (
             <FeaturedProductCard key={product.id} product={product} index={index} />
@@ -189,7 +211,8 @@ function FeaturedProducts() {
         <div className="text-center mt-10">
           <Link 
             to="/featured-products"
-            className="bg-gradient-to-r from-light-orange to-primary-orange hover:from-primary-orange hover:to-orange-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 inline-block transform hover:scale-105"
+                            className="text-white font-bold py-3 px-8 rounded-full transition-all duration-300 inline-block transform hover:scale-105"
+            style={{ backgroundColor: '#E53935' }}
           >
             ⭐ عرض جميع المنتجات المميزة
           </Link>

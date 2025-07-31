@@ -15,15 +15,17 @@ function ScrollToTop() {
         return;
       }
       
+      // التحقق من أن الصفحة محملة بالكامل
+      if (document.readyState === 'loading') {
+        return;
+      }
+      
       // التمرير الفوري إلى أعلى الصفحة
       window.scrollTo(0, 0);
     };
 
-    // استدعاء فوري للتمرير
-    scrollToTop();
-
-    // تأخير إضافي للتأكد من اكتمال العرض
-    const scrollTimer = setTimeout(scrollToTop, 100);
+    // تأخير قصير للتأكد من اكتمال العرض أولاً
+    const scrollTimer = setTimeout(scrollToTop, 50);
 
     // تنظيف timer
     return () => clearTimeout(scrollTimer);

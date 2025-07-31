@@ -90,17 +90,17 @@ function CheckoutPage() {
         notes: formData.notes.trim(),
         items: cartItems.map(item => ({
           shop_product_id: item.id,
-          qty: item.quantity
+          qty: item.quantity,
+          sizes: item.sizes || []
         }))
       };
 
-      console.log('Sending order data:', orderData);
+
 
       // إرسال الطلب
       const response = await createOrder(orderData);
       
-      console.log('Order response:', response);
-      console.log('Order response data:', response.data);
+      
 
       // تحديد أن الطلب تم إكماله قبل مسح السلة
       setOrderCompleted(true);
@@ -112,7 +112,7 @@ function CheckoutPage() {
       hideLoading();
 
       // التوجيه لصفحة تأكيد الطلب
-      console.log('Navigating to order-success with data:', response.data);
+      
       navigate('/order-success', { 
         state: { orderData: response.data },
         replace: true
@@ -144,6 +144,7 @@ function CheckoutPage() {
         >
           <h1 className="text-3xl font-bold text-dark-blue mb-2">إتمام الطلب</h1>
           <p className="text-gray-600">أدخل بياناتك لإتمام عملية الشراء</p>
+          <p className="text-sm text-gray-500 mt-2">تاريخ الطلب: {new Date().toLocaleDateString('ar-SA')}</p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -171,11 +172,14 @@ function CheckoutPage() {
                     <div>
                       <h3 className="font-semibold text-dark-blue">{item.name || 'منتج غير محدد'}</h3>
                       <p className="text-gray-600">الكمية: {item.quantity || 1}</p>
+                      {item.sizes && item.sizes.length > 0 && (
+                        <p className="text-sm text-gray-500">المقاسات: {item.sizes.join(', ')}</p>
+                      )}
                     </div>
                   </div>
                   <div className="text-left">
-                    <p className="font-bold text-primary-orange">{((item.price || 0) * (item.quantity || 1))} ر.س</p>
-                    <p className="text-sm text-gray-500">{item.price || 0} ر.س × {item.quantity || 1}</p>
+                    <p className="font-bold text-primary-orange">{((item.price || 0) * (item.quantity || 1))} ل.س</p>
+                    <p className="text-sm text-gray-500">{item.price || 0} ل.س × {item.quantity || 1}</p>
                   </div>
                 </div>
               ))}
@@ -184,7 +188,7 @@ function CheckoutPage() {
             <div className="mt-6 pt-4 border-t border-gray-200">
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-dark-blue">الإجمالي:</span>
-                <span className="text-2xl font-bold text-primary-orange">{getCartTotal()} ر.س</span>
+                <span className="text-2xl font-bold text-primary-orange">{getCartTotal()} ل.س</span>
               </div>
             </div>
           </motion.div>
@@ -286,7 +290,7 @@ function CheckoutPage() {
                     : 'bg-primary-orange hover:bg-orange-600 transform hover:scale-105'
                 }`}
               >
-                {isSubmitting ? 'جاري إرسال الطلب...' : `إرسال الطلب (${getCartTotal()} ر.س)`}
+                {isSubmitting ? 'جاري إرسال الطلب...' : `إرسال الطلب (${getCartTotal()} ل.س)`}
               </button>
             </form>
           </motion.div>

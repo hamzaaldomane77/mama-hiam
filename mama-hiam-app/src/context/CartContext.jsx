@@ -72,11 +72,14 @@ export const CartProvider = ({ children }) => {
   // إضافة منتج إلى السلة
   const addToCart = (product) => {
     setCartItems(prevItems => {
-      // التحقق مما إذا كان المنتج موجود بالفعل في السلة
-      const existingItemIndex = prevItems.findIndex(item => item.id === product.id);
+      // التحقق مما إذا كان المنتج موجود بالفعل في السلة بنفس المقاسات
+      const existingItemIndex = prevItems.findIndex(item => {
+        const sameSizes = JSON.stringify(item.sizes?.sort()) === JSON.stringify(product.sizes?.sort());
+        return item.id === product.id && sameSizes;
+      });
       
       if (existingItemIndex > -1) {
-        // إذا كان المنتج موجودًا بالفعل، قم بزيادة الكمية
+        // إذا كان المنتج موجودًا بالفعل بنفس المقاسات، قم بزيادة الكمية
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
@@ -84,8 +87,9 @@ export const CartProvider = ({ children }) => {
         };
         return updatedItems;
       } else {
-        // إذا لم يكن المنتج موجودًا، أضفه بكمية 1
-        return [...prevItems, { ...product, quantity: 1 }];
+        // إذا لم يكن المنتج موجودًا أو كان بمقاسات مختلفة، أضفه بكمية 1
+        const cartId = `${product.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return [...prevItems, { ...product, quantity: 1, cartId }];
       }
     });
   };
@@ -93,11 +97,14 @@ export const CartProvider = ({ children }) => {
   // إضافة منتج إلى السلة مع كمية محددة
   const addToCartWithQuantity = (product, quantity = 1) => {
     setCartItems(prevItems => {
-      // التحقق مما إذا كان المنتج موجود بالفعل في السلة
-      const existingItemIndex = prevItems.findIndex(item => item.id === product.id);
+      // التحقق مما إذا كان المنتج موجود بالفعل في السلة بنفس المقاسات
+      const existingItemIndex = prevItems.findIndex(item => {
+        const sameSizes = JSON.stringify(item.sizes?.sort()) === JSON.stringify(product.sizes?.sort());
+        return item.id === product.id && sameSizes;
+      });
       
       if (existingItemIndex > -1) {
-        // إذا كان المنتج موجودًا بالفعل، قم بزيادة الكمية
+        // إذا كان المنتج موجودًا بالفعل بنفس المقاسات، قم بزيادة الكمية
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
@@ -105,27 +112,28 @@ export const CartProvider = ({ children }) => {
         };
         return updatedItems;
       } else {
-        // إذا لم يكن المنتج موجودًا، أضفه بالكمية المحددة
-        return [...prevItems, { ...product, quantity: quantity }];
+        // إذا لم يكن المنتج موجودًا أو كان بمقاسات مختلفة، أضفه بالكمية المحددة
+        const cartId = `${product.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        return [...prevItems, { ...product, quantity: quantity, cartId }];
       }
     });
   };
   
   // إزالة منتج من السلة
   const removeFromCart = (productId) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+    setCartItems(prevItems => prevItems.filter(item => item.cartId !== productId));
   };
   
   // تغيير كمية منتج في السلة
-  const updateQuantity = (productId, newQuantity) => {
+  const updateQuantity = (cartId, newQuantity) => {
     if (newQuantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(cartId);
       return;
     }
     
     setCartItems(prevItems => 
       prevItems.map(item => 
-        item.id === productId ? { ...item, quantity: newQuantity } : item
+        item.cartId === cartId ? { ...item, quantity: newQuantity } : item
       )
     );
   };

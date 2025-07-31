@@ -109,14 +109,14 @@ export const searchProducts = async (searchTerm, page = 1) => {
 
 /**
  * جلب المنتجات حسب الفئة
- * @param {string} category - اسم الفئة
+ * @param {number|string} categoryId - معرف الفئة
  * @param {number} page - رقم الصفحة
  */
-export const fetchProductsByCategory = async (category, page = 1) => {
+export const fetchProductsByCategory = async (categoryId, page = 1) => {
   try {
     const response = await apiClient.get('/products', {
       params: { 
-        category: category,
+        category_id: categoryId,
         page
       }
     });
@@ -208,6 +208,20 @@ export const fetchCategories = async () => {
 };
 
 /**
+ * جلب فئة واحدة بواسطة ID
+ * @param {number|string} categoryId - معرف الفئة
+ */
+export const fetchCategoryById = async (categoryId) => {
+  try {
+    const response = await apiClient.get(`/categories/${categoryId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching category by ID:', error);
+    throw error;
+  }
+};
+
+/**
  * إرسال رسالة تواصل
  * @param {Object} contactData - بيانات الرسالة
  */
@@ -287,6 +301,23 @@ export const fetchBranches = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching branches:', error);
+    throw error;
+  }
+};
+
+// ================================
+// APIs الخاصة بالإعدادات (Settings)
+// ================================
+
+/**
+ * جلب إعدادات الموقع
+ */
+export const fetchSettings = async () => {
+  try {
+    const response = await apiClient.get('/settings');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching settings:', error);
     throw error;
   }
 };

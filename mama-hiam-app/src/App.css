@@ -29,3 +29,23 @@ input, textarea, select, button {
 .text-sm, .text-xs {
   font-family: 'Almarai', sans-serif;
 }
+
+/* تحسينات للتمرير */
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* منع التمرير أثناء التحميل */
+body.loading {
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}

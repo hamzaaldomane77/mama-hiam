@@ -27,9 +27,18 @@ function TestimonialSlideContent({ testimonial }) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center p-2 md:p-10 bg-gradient-to-br from-white to-cream-beige/50 border border-primary-orange/10 rounded-xl mx-auto max-w-4xl min-h-[280px] relative pb-6 shadow-lg">
+    <div className="flex flex-col md:flex-row items-center justify-center p-2 md:p-10 border rounded-xl mx-auto max-w-4xl min-h-[280px] relative pb-6 shadow-lg"
+         style={{ 
+           backgroundColor: '#FFFFFF',
+           borderColor: '#F5F5F5'
+         }}>
         {/* Decorative Quote Icon - Moved right */}
-        <svg className="absolute top-4 right-4 rtl:right-auto rtl:left-4 w-10 h-10 text-primary-orange/20 z-0" fill="currentColor" viewBox="0 0 32 32" ><path d="M14,12 H 8 V 8 H12 C 12,4.691 9.309,2 6,2 H 0 V 12 H 6 V 18 H 0 V 30 H 14 V 12 Z M 32,12 H 26 V 8 H 30 C 30,4.691 27.309,2 24,2 H 18 V 12 H 24 V 18 H 18 V 30 H 32 V 12 Z"></path></svg>
+        <svg className="absolute top-4 right-4 rtl:right-auto rtl:left-4 w-10 h-10 z-0" 
+             fill="currentColor" 
+             viewBox="0 0 32 32"
+             style={{ color: '#E53935', opacity: 0.2 }}>
+          <path d="M14,12 H 8 V 8 H12 C 12,4.691 9.309,2 6,2 H 0 V 12 H 6 V 18 H 0 V 30 H 14 V 12 Z M 32,12 H 26 V 8 H 30 C 30,4.691 27.309,2 24,2 H 18 V 12 H 24 V 18 H 18 V 30 H 32 V 12 Z"></path>
+        </svg>
         
         {/* Text Content with Animation - Now on the left */}
         <motion.div 
@@ -39,13 +48,23 @@ function TestimonialSlideContent({ testimonial }) {
             viewport={{ once: true, amount: 0.5 }}
             className="flex-grow text-right z-10 order-2 md:order-1 md:mr-8 rtl:md:ml-8 rtl:md:mr-0 "
         >
-            <p className="text-xl md:text-2xl font-medium text-dark-blue leading-relaxed mb-4">{testimonial.quote}</p>
-            <h4 className="font-bold text-xl text-primary-orange mb-1">- {testimonial.name}</h4>
+            <p className="text-xl md:text-2xl font-medium leading-relaxed mb-4"
+               style={{ color: '#E53935' }}>
+              {testimonial.quote}
+            </p>
+            <h4 className="font-bold text-xl mb-1" style={{ color: '#E53935' }}>
+              - {testimonial.name}
+            </h4>
             {/* Re-added Rating Stars */}
             {testimonial.rating && (
                 <div className="flex justify-start mt-4">
                     {[...Array(5)].map((_, i) => (
-                    <svg key={i} className={`w-7 h-7 ${i < testimonial.rating ? 'text-light-orange'  : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                    <svg key={i} className={`w-7 h-7`} 
+                         fill="currentColor" 
+                         viewBox="0 0 20 20"
+                         style={{ color: i < testimonial.rating ? '#FFF4B1' : '#F5F5F5' }}>
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
                     ))}
                 </div>
             )}
@@ -56,7 +75,8 @@ function TestimonialSlideContent({ testimonial }) {
             <img
                 src={testimonial.imageUrl}
                 alt={testimonial.name}
-                className="w-32 h-32 rounded-full object-cover border-4 border-primary-orange/20 shadow-lg"
+                className="w-32 h-32 rounded-full object-cover border-4 shadow-lg"
+                style={{ borderColor: '#FADADD' }}
             />
         </div>
 
@@ -67,9 +87,24 @@ function TestimonialSlideContent({ testimonial }) {
 // --- Testimonials Section ---
 function Testimonials() {
   return (
-    <section className="py-10 pb-20  bg-gradient-to-br from-white via-light-orange/5 to-cream-beige/15">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-primary-orange mb-12">شهادات نعتز بها</h2>
+    <section className="py-10 pb-20 relative overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
+      {/* خلفية ملونة طفولية */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-pink-50/20 to-green-50/30"></div>
+      
+      {/* طبقة تدرج إضافية */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-yellow-50/20 via-transparent to-blue-50/20"></div>
+      
+      {/* عناصر زخرفية */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 right-10 w-80 h-80 rounded-full blur-3xl" style={{ backgroundColor: '#A7D8F0', opacity: 0.3 }}></div>
+        <div className="absolute bottom-20 left-10 w-64 h-64 rounded-full blur-3xl" style={{ backgroundColor: '#FADADD', opacity: 0.4 }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl" style={{ backgroundColor: '#FFF4B1', opacity: 0.2 }}></div>
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#E53935' }}>
+          شهادات نعتز بها
+        </h2>
         <Swiper
           modules={[Autoplay, Pagination, EffectFade]}
           spaceBetween={30} 
@@ -78,7 +113,7 @@ function Testimonials() {
           fadeEffect={{
              crossFade: true
           }}
-          loop={true}
+          loop={testimonialsData.length > 1}
           autoplay={{
             delay: 4500,
             disableOnInteraction: false,

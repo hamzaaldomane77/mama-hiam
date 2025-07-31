@@ -9,15 +9,14 @@ function OrderSuccessPage() {
   const orderData = location.state?.orderData;
 
   // تسجيل للتشخيص
-  console.log('OrderSuccessPage - location.state:', location.state);
-  console.log('OrderSuccessPage - orderData:', orderData);
+
 
   // إذا لم تكن هناك بيانات طلب، توجيه للصفحة الرئيسية بعد تأخير
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
       if (!orderData) {
-        console.log('No order data found, redirecting to home...');
+    
         navigate('/', { replace: true });
       }
     }, 1000); // انتظار ثانية واحدة

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../context/CartContext";
-import { fetchProducts, searchProducts, fetchProductsByCategory } from "../../services/api";
+import { fetchProducts, searchProducts, fetchProductsByCategory, fetchCategories } from "../../services/api";
 import { Link, useLocation, useSearchParams, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 // تعريف الألوان - محدثة لتتناسق مع الموقع
 const colors = {
@@ -21,6 +22,10 @@ function ProductsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
+  const [loadingCategoryName, setLoadingCategoryName] = useState(false);
+  const [allCategories, setAllCategories] = useState([]);
+  const [hasShownFirstAddToast, setHasShownFirstAddToast] = useState(false);
   const { addToCart, cartItems } = useCart();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -29,14 +34,60 @@ function ProductsPage() {
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
     if (categoryFromUrl) {
-      setSelectedCategory(categoryFromUrl);
-      setIsSearching(true); // نعتبر التصفية حسب الفئة كنوع من البحث
+      // التحقق من أن القيمة رقم (ID التصنيف)
+      const categoryId = parseInt(categoryFromUrl);
+      if (!isNaN(categoryId)) {
+        setSelectedCategory(categoryId);
+        setIsSearching(true); // نعتبر التصفية حسب الفئة كنوع من البحث
+        // جلب اسم التصنيف من القائمة المحفوظة
+        loadCategoryName(categoryId);
+      } else {
+        setSelectedCategory(null);
+        setSelectedCategoryName("");
+        setIsSearching(false);
+      }
     } else {
       setSelectedCategory(null);
+      setSelectedCategoryName("");
       setIsSearching(false);
     }
     setCurrentPage(1); // إعادة تعيين الصفحة الحالية عند تغيير الفئة
-  }, [searchParams]);
+  }, [searchParams, allCategories]); // إضافة allCategories كتبعية
+
+  // دالة جلب اسم التصنيف
+  const loadCategoryName = (categoryId) => {
+    try {
+      setLoadingCategoryName(true);
+      
+      // البحث عن التصنيف في القائمة المحفوظة
+      const category = allCategories.find(cat => cat.id === parseInt(categoryId));
+      
+      if (category) {
+        setSelectedCategoryName(category.name);
+      } else {
+        // إذا لم يتم العثور على التصنيف، انتظر قليلاً ثم حاول مرة أخرى
+        setTimeout(() => {
+          const retryCategory = allCategories.find(cat => cat.id === parseInt(categoryId));
+          if (retryCategory) {
+            setSelectedCategoryName(retryCategory.name);
+          } else {
+            setSelectedCategoryName(`التصنيف ${categoryId}`);
+          }
+          setLoadingCategoryName(false);
+        }, 500);
+        return; // لا نضع setLoadingCategoryName(false) هنا لأننا ننتظر
+      }
+    } catch (err) {
+      console.error('Error loading category name:', err);
+      setSelectedCategoryName(`التصنيف ${categoryId}`);
+    }
+    setLoadingCategoryName(false);
+  };
+
+  // جلب جميع التصنيفات عند تحميل المكون
+  useEffect(() => {
+    loadAllCategories();
+  }, []);
 
   // جلب المنتجات عند تحميل المكون أو تغيير الصفحة أو الفئة
   useEffect(() => {
@@ -46,6 +97,18 @@ function ProductsPage() {
       loadProducts(currentPage);
     }
   }, [currentPage, selectedCategory]);
+
+  // دالة جلب جميع التصنيفات
+  const loadAllCategories = async () => {
+    try {
+      const data = await fetchCategories();
+      if (data && Array.isArray(data.data)) {
+        setAllCategories(data.data);
+      }
+    } catch (err) {
+      console.error('Error loading categories:', err);
+    }
+  };
 
   // دالة جلب المنتجات
   const loadProducts = async (page = 1) => {
@@ -84,7 +147,7 @@ function ProductsPage() {
       }
     } catch (err) {
       console.error('Error loading products by category:', err);
-      setError('حدث خطأ في تحميل منتجات هذا الصنف. يرجى المحاولة مرة أخرى.');
+      setError(`حدث خطأ في تحميل منتجات صنف "${loadingCategoryName ? '...' : selectedCategoryName}". يرجى المحاولة مرة أخرى.`);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -167,6 +230,20 @@ function ProductsPage() {
       image: product.images?.[0] || 'https://placehold.co/400x300/FFEED9/333333?text=صورة+غير+متوفرة'
     };
     addToCart(cartProduct);
+    
+    // عرض توست النجاح
+    toast.success('تم إضافة المنتج إلى السلة بنجاح! 🛒');
+    
+    // عرض توست نصيحة للمرة الأولى فقط
+    if (!hasShownFirstAddToast) {
+      setTimeout(() => {
+        toast('نصيحة: للحصول على أفضل تجربة، ننصحك بالدخول إلى صفحة المنتج وإضافة القياس المناسب 💡', {
+          duration: 6000,
+          icon: '💡',
+        });
+        setHasShownFirstAddToast(true);
+      }, 1000);
+    }
   };
 
   // تكوين تأثير لظهور البطاقات
@@ -244,7 +321,18 @@ function ProductsPage() {
         <div className="container mx-auto py-24 px-4">
           <div className="relative">
             <h1 className="text-4xl font-bold text-center mb-10 text-dark-blue">
-              {selectedCategory ? `منتجات: ${selectedCategory}` : 'المنتجات'}
+              {selectedCategory ? (
+                loadingCategoryName ? (
+                  <div className="flex items-center justify-center gap-3">
+                    <span>منتجات:</span>
+                    <div className="animate-pulse bg-gray-300 h-8 w-32 rounded"></div>
+                  </div>
+                ) : (
+                  `منتجات: ${selectedCategoryName}`
+                )
+              ) : (
+                'المنتجات'
+              )}
               <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-transparent via-primary-orange to-transparent"></div>
             </h1>
             {selectedCategory && (
@@ -258,6 +346,14 @@ function ProductsPage() {
                   </svg>
                   العودة إلى الأصناف
                 </Link>
+                <span className="mx-2 text-dark-blue/40">|</span>
+                <span className="text-dark-blue/70">
+                  {loadingCategoryName ? (
+                    <div className="inline-block animate-pulse bg-gray-300 h-4 w-20 rounded"></div>
+                  ) : (
+                    selectedCategoryName
+                  )}
+                </span>
                 <span className="mx-2 text-dark-blue/40">|</span>
                 <Link 
                   to="/products" 
@@ -404,7 +500,7 @@ function ProductsPage() {
                           
                       <button
                         onClick={() => handleAddToCart(product)}
-                            className={`relative text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all duration-200 shadow-lg hover:shadow-xl ${
+                            className={`relative text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-all duration-200 flex items-center justify-center gap-2 ${
                           isInCart(product.id)
                             ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:ring-green-300"
                                 : "bg-gradient-to-r from-primary-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 focus:ring-orange-300"
@@ -412,10 +508,15 @@ function ProductsPage() {
                       >
                         {isInCart(product.id) ? (
                           <>
-                            <span className="mr-1">✓</span> في السلة
+                            <span className="text-lg">✓</span> في السلة
                           </>
                         ) : (
-                          "أضف للسلة"
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            أضف للسلة
+                          </>
                         )}
                       </button>
                     </div>
@@ -444,7 +545,7 @@ function ProductsPage() {
               </svg>
                   <h3 className="text-xl font-semibold text-dark-blue">
                     {selectedCategory 
-                      ? `لا توجد منتجات في صنف "${selectedCategory}"` 
+                      ? `لا توجد منتجات في صنف "${loadingCategoryName ? '...' : selectedCategoryName}"` 
                       : isSearching 
                       ? 'لا توجد منتجات مطابقة للبحث' 
                       : 'لا توجد منتجات متوفرة حالياً'
